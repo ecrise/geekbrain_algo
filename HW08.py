@@ -1,4 +1,5 @@
-﻿from copy import copy
+﻿import hashlib
+from copy import copy
 
 
 class BinTree:
@@ -50,7 +51,31 @@ class BinTree:
         return f"BinTree[{self.data:^5}]"
 
 
-def hafman_cod() -> int:
+def substr_search() -> int:
+    """1. Определение количества различных подстрок с использованием хэш-функции. Пусть дана строка S длиной N,
+    состоящая только из маленьких латинских букв. Требуется найти количество различных подстрок в этой строке"""
+    initial_str = "addfafdfasdfafaasd"
+    initial_str_len = len(initial_str)
+    substr_dict = {}
+    for i in range(1, initial_str_len // 2 + 1):
+        for j in range(initial_str_len):
+            if i + j > initial_str_len:
+                break
+            substr = initial_str[j:j + i]
+            substr_hash = hashlib.sha1(substr.encode("utf-8")).hexdigest()
+            if substr_hash in substr_dict:
+                substr_dict[substr_hash][1] += 1
+            else:
+                substr_dict[substr_hash] = [substr, 1]
+            # substr_dict.setdefault(initial_str[j:j + i], 0)
+    for h in substr_dict:
+        if substr_dict[h][1] > 1:
+            print(f"Substing '{substr_dict[h][0]}' meets in sentence {substr_dict[h][1]} times")
+    print("All least substrings meet in sentence only onse")
+    return 0
+
+
+def haffman_cod() -> int:
     """2. Закодируйте любую строку из трех слов по алгоритму Хаффмана."""
 
     def char_coding(hm_tree: BinTree, code="", char_dict={}) -> dict:
@@ -63,7 +88,7 @@ def hafman_cod() -> int:
             char_coding(hm_tree.right, code + "1")
         return char_dict
 
-    coding_str = input("Введите исходную фразу для кодирования:\n")
+    coding_str = input("Please, enter a sentence for coding:\n")
     char_frequent = {}
     for ch in coding_str:
         char_frequent.setdefault(ch, 0)
@@ -98,8 +123,29 @@ def hafman_cod() -> int:
                 char_frequent.append(copy(hafman_tree))
     # вычисляем код для каждого символа
     cod_table = char_coding(hafman_tree)
-    print(f"Итоговая кодировочная таблица:\n{cod_table}")
-    print("Полученная закодированная фраза:")
+    print(f"The coding table is:\n{cod_table}")
+    print("The coding sentence is:")
     for ch in coding_str:
         print(cod_table[ch], end="")
+    print()
     return 0
+
+
+menu = {
+    "Task 1: Substring searching": substr_search,
+    "Task 2: Haffman coding": haffman_cod,
+    "EXIT": exit
+    }
+
+while True:
+    for k, v in enumerate(menu, start=1):
+        print(f"{k} - {v}")
+    command = int(input("Please, enter a command number: "))
+    if 1 <= command <= len(menu):
+        command_key = list(menu.keys())[command - 1]
+        print("______________________________")
+        menu[command_key]()
+        print("______________________________")
+    else:
+        print("You enter incorrect command, please repeat")
+        print("______________________________")
